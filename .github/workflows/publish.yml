@@ -1,0 +1,30 @@
+name: publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+      - name: Verify release tag matches composer version
+        run: |
+          VERSION="v$(php -r 'echo json_decode(file_get_contents("composer.json"), true)["version"];')"
+          if [ "${{ github.event.release.tag_name }}" != "$VERSION" ]; then
+            echo "Release tag ${{ github.event.release.tag_name }} does not match composer.json version $VERSION"
+            exit 1
+          fi
+      # Plain validate: the explicit composer.json version field (required by the
+      # release-tag guard) warns under --strict and fails CI.
+      - run: composer validate
+      - run: composer install --prefer-dist --no-progress
+      - run: composer lint
+      - run: composer stan
+      - run: composer test
+      # No publish step: Packagist auto-updates from the release tag.
