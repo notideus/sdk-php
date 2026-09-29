@@ -55,7 +55,8 @@ final class EmailsResourceTest extends TestCase
     {
         $history = [];
         $notideus = $this->client([
-            new Response(200, [], '{"data":[{"index":0,"id":"9c2e"},{"index":1,"error":{"code":"from_domain_not_verified",'
+            new Response(200, [], '{"data":[{"index":0,"id":"9c2e"},{"index":1,"error":'
+                . '{"code":"from_domain_not_verified",'
                 . '"message":"no verified domain matches the from address"}}]}'),
         ], $history);
 
