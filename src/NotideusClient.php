@@ -7,12 +7,14 @@ namespace Notideus;
 use Notideus\Http\ApiClient;
 use Notideus\Resources\ContactsResource;
 use Notideus\Resources\EmailsResource;
+use Notideus\Resources\WhatsAppResource;
 
 final class NotideusClient
 {
     private readonly ApiClient $api;
     private ?EmailsResource $emails = null;
     private ?ContactsResource $contacts = null;
+    private ?WhatsAppResource $whatsapp = null;
 
     /** @param array<string, mixed> $options */
     public function __construct(?string $apiKey = null, array $options = [])
@@ -28,5 +30,10 @@ final class NotideusClient
     public function contacts(): ContactsResource
     {
         return $this->contacts ??= new ContactsResource($this->api);
+    }
+
+    public function whatsapp(): WhatsAppResource
+    {
+        return $this->whatsapp ??= new WhatsAppResource($this->api);
     }
 }
