@@ -9,6 +9,7 @@ use Notideus\Resources\ContactsResource;
 use Notideus\Resources\EmailsResource;
 use Notideus\Resources\PlansResource;
 use Notideus\Resources\UnsubscribeResource;
+use Notideus\Resources\WebhooksResource;
 use Notideus\Resources\WhatsAppResource;
 
 final class NotideusClient
@@ -19,6 +20,7 @@ final class NotideusClient
     private ?WhatsAppResource $whatsapp = null;
     private ?UnsubscribeResource $unsubscribe = null;
     private ?PlansResource $plans = null;
+    private ?WebhooksResource $webhooks = null;
 
     /** @param array<string, mixed> $options */
     public function __construct(?string $apiKey = null, array $options = [])
@@ -49,5 +51,10 @@ final class NotideusClient
     public function plans(): PlansResource
     {
         return $this->plans ??= new PlansResource($this->api);
+    }
+
+    public function webhooks(): WebhooksResource
+    {
+        return $this->webhooks ??= new WebhooksResource($this->api);
     }
 }
