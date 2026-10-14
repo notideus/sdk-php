@@ -91,6 +91,35 @@ if (isset($page['next_cursor'])) {
 }
 ```
 
+### Webhooks
+
+```php
+$created = $notideus->webhooks()->create([
+    'name' => 'Production API',
+    'url' => 'https://example.com/hook',
+    'events' => ['email.delivered'],
+]);
+// $created['secret'] — whsec_…, shown once
+$notideus->webhooks()->update($created['endpoint']['id'], [
+    'name' => 'Production API',
+    'url' => 'https://example.com/hook',
+    'events' => ['email.delivered'],
+    'status' => 'disabled',
+]);
+$log = $notideus->webhooks()->deliveries()->list(['endpoint_id' => $created['endpoint']['id']]);
+$notideus->webhooks()->deliveries()->redeliver($log['data'][0]['id']);
+$events = $notideus->webhooks()->events();
+```
+
+### Inbound email
+
+```php
+$routes = $notideus->inbound()->routes()->list(); // { data, meta }
+$notideus->inbound()->routes()->create(['domain_id' => $domainId, 'recipient' => 'support', 'store' => true]);
+$inbox = $notideus->inbound()->messages()->list(['q' => 'billing']);
+$raw = $notideus->inbound()->messages()->raw($inbox['data'][0]['id']); // ['contents', 'filename', 'content_type']
+```
+
 ### Hosted unsubscribe (token-based, unauthenticated)
 
 ```php
@@ -146,7 +175,7 @@ The SDK retries network errors, 5xx and 429 (honoring `Retry-After`) with
 exponential backoff — but only idempotent requests: reads/writes other than
 POST, and sends that include an `idempotency_key` (matching the API's replay
 semantics, so a retried send never double-sends). Set `max_retries: 0` to
-disable.
+disable. Binary downloads (raw MIME / attachments) are never retried.
 
 ## Self-hosting / local development
 

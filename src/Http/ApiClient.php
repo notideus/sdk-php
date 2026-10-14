@@ -95,6 +95,40 @@ final class ApiClient
     }
 
     /**
+     * Downloads a binary endpoint (raw MIME, attachments). Returns the body
+     * contents plus filename (from Content-Disposition) and content type.
+     * No retries — binary payloads are not idempotent-safe to re-fetch
+     * blindly, and callers can re-invoke cheaply.
+     *
+     * @return array{contents: string, filename: string, content_type: string}
+     */
+    public function requestBinary(string $path): array
+    {
+        $opts = [];
+        if ($this->apiKey !== null) {
+            $opts['headers']['Authorization'] = 'Bearer ' . $this->apiKey;
+        }
+
+        try {
+            $response = $this->http->request('GET', ltrim($path, '/'), $opts);
+        } catch (ConnectException | RequestException $e) {
+            throw self::toException($e);
+        }
+
+        $disposition = $response->getHeaderLine('Content-Disposition');
+        $filename = 'download';
+        if (preg_match('/filename="?([^";]+)"?/', $disposition, $m) === 1) {
+            $filename = $m[1];
+        }
+
+        return [
+            'contents' => (string) $response->getBody(),
+            'filename' => $filename,
+            'content_type' => $response->getHeaderLine('Content-Type') ?: 'application/octet-stream',
+        ];
+    }
+
+    /**
      * @param array<string, mixed>|null $body
      */
     private function shouldRetry(
