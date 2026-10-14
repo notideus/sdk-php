@@ -159,6 +159,22 @@ final class WebhooksResourceTest extends TestCase
         self::assertSame('/v1/webhooks/meta/events', $history[0]['request']->getUri()->getPath());
     }
 
+    public function testRotateSecretReturnsEndpointAndSecret(): void
+    {
+        $history = [];
+        $notideus = $this->client([
+            new Response(200, [], '{"endpoint":' . self::ENDPOINT . ',"secret":"whsec_new"}'),
+        ], $history);
+
+        $rotated = $notideus->webhooks()->rotateSecret('8f2c');
+
+        self::assertSame('whsec_new', $rotated['secret']);
+        self::assertSame('8f2c', $rotated['endpoint']['id']);
+        self::assertSame('POST', $history[0]['request']->getMethod());
+        self::assertSame('/v1/webhooks/8f2c/rotate-secret', $history[0]['request']->getUri()->getPath());
+        self::assertSame('', (string) $history[0]['request']->getBody());
+    }
+
     public function testDeliveriesListPassesThroughFilters(): void
     {
         $history = [];

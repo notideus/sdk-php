@@ -78,6 +78,20 @@ final class WebhooksResource
         return $result['delivery'];
     }
 
+    /**
+     * Rotates the endpoint's signing secret; the new secret is returned exactly
+     * once and the old one stops working immediately.
+     *
+     * @return array{endpoint: array<string, mixed>, secret: string}
+     */
+    public function rotateSecret(string $id): array
+    {
+        /** @var array{endpoint: array<string, mixed>, secret: string} $result */
+        $result = $this->api->request('POST', '/v1/webhooks/' . rawurlencode($id) . '/rotate-secret');
+
+        return $result;
+    }
+
     /** @return array<int, array<string, mixed>> */
     public function events(): array
     {
