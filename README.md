@@ -175,7 +175,7 @@ The SDK retries network errors, 5xx and 429 (honoring `Retry-After`) with
 exponential backoff — but only idempotent requests: reads/writes other than
 POST, and sends that include an `idempotency_key` (matching the API's replay
 semantics, so a retried send never double-sends). Set `max_retries: 0` to
-disable.
+disable. Binary downloads (raw MIME / attachments) are never retried.
 
 ## Self-hosting / local development
 
