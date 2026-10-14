@@ -7,6 +7,7 @@ namespace Notideus;
 use Notideus\Http\ApiClient;
 use Notideus\Resources\ContactsResource;
 use Notideus\Resources\EmailsResource;
+use Notideus\Resources\InboundResource;
 use Notideus\Resources\PlansResource;
 use Notideus\Resources\UnsubscribeResource;
 use Notideus\Resources\WebhooksResource;
@@ -21,6 +22,7 @@ final class NotideusClient
     private ?UnsubscribeResource $unsubscribe = null;
     private ?PlansResource $plans = null;
     private ?WebhooksResource $webhooks = null;
+    private ?InboundResource $inbound = null;
 
     /** @param array<string, mixed> $options */
     public function __construct(?string $apiKey = null, array $options = [])
@@ -56,5 +58,10 @@ final class NotideusClient
     public function webhooks(): WebhooksResource
     {
         return $this->webhooks ??= new WebhooksResource($this->api);
+    }
+
+    public function inbound(): InboundResource
+    {
+        return $this->inbound ??= new InboundResource($this->api);
     }
 }
