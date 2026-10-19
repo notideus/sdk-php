@@ -96,6 +96,38 @@ final class ApiClientTest extends TestCase
         }
     }
 
+    public function testParsesReasonOnAccountSuspended(): void
+    {
+        $client = $this->client([
+            new Response(
+                403,
+                [],
+                '{"error":{"code":"account_suspended","message":"this account is suspended",'
+                    . '"reason":"spam complaints"}}'
+            ),
+        ]);
+        try {
+            $client->request('GET', '/v1/contacts');
+            self::fail('expected NotideusException');
+        } catch (NotideusException $e) {
+            self::assertSame('account_suspended', $e->getErrorCode());
+            self::assertSame('spam complaints', $e->getReason());
+        }
+    }
+
+    public function testReasonIsNullWhenAbsent(): void
+    {
+        $client = $this->client([
+            new Response(401, [], '{"error":{"code":"unauthorized","message":"bad key"}}'),
+        ]);
+        try {
+            $client->request('GET', '/v1/contacts');
+            self::fail('expected NotideusException');
+        } catch (NotideusException $e) {
+            self::assertNull($e->getReason());
+        }
+    }
+
     public function testReturnsNullFor204(): void
     {
         $client = $this->client([new Response(204)]);

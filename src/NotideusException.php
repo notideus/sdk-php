@@ -13,6 +13,7 @@ final class NotideusException extends RuntimeException
         string $message,
         private readonly int $status,
         private readonly ?int $retryAfter = null,
+        private readonly ?string $reason = null,
     ) {
         parent::__construct($message);
     }
@@ -30,5 +31,13 @@ final class NotideusException extends RuntimeException
     public function getRetryAfter(): ?int
     {
         return $this->retryAfter;
+    }
+
+    /**
+     * Admin-provided note, present on account_suspended errors.
+     */
+    public function getReason(): ?string
+    {
+        return $this->reason;
     }
 }

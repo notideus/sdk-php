@@ -170,7 +170,7 @@ final class ApiClient
         if ($response === null) {
             return new NotideusException('network_error', $e->getMessage(), 0);
         }
-        /** @var array{error?: array{code?: string, message?: string}}|null $payload */
+        /** @var array{error?: array{code?: string, message?: string, reason?: string}}|null $payload */
         $payload = json_decode((string) $response->getBody(), true);
         $code = is_array($payload) && isset($payload['error']['code'])
             ? (string) $payload['error']['code']
@@ -178,10 +178,13 @@ final class ApiClient
         $message = is_array($payload) && isset($payload['error']['message'])
             ? (string) $payload['error']['message']
             : 'HTTP ' . $response->getStatusCode();
+        $reason = is_array($payload) && isset($payload['error']['reason'])
+            ? (string) $payload['error']['reason']
+            : null;
         $retryAfter = $response->hasHeader('Retry-After')
             ? (int) $response->getHeaderLine('Retry-After')
             : null;
 
-        return new NotideusException($code, $message, $response->getStatusCode(), $retryAfter);
+        return new NotideusException($code, $message, $response->getStatusCode(), $retryAfter, $reason);
     }
 }

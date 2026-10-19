@@ -150,6 +150,7 @@ try {
         $e->getRetryAfter(); // seconds to wait
     }
     $e->getStatus(); // HTTP status
+    $e->getReason(); // optional admin note on account_suspended
 }
 ```
 
