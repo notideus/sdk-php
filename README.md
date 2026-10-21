@@ -29,6 +29,9 @@ $email = $notideus->emails()->send([
     'variables' => ['name' => 'Jane'],
     'tags' => ['welcome'],
     'idempotency_key' => 'req-123',
+    // Opt into platform open/click tracking for this send:
+    'track_opens' => true,
+    'track_clicks' => true,
 ]);
 ```
 
@@ -57,7 +60,7 @@ Params and responses use snake_case exactly like the API.
 ### Emails
 
 ```php
-$notideus->emails()->send(['from', 'to', 'subject', 'html?', 'text?', 'template_id?', 'variables?', 'tags?', 'headers?', 'reply_to?', 'idempotency_key?']);
+$notideus->emails()->send(['from', 'to', 'subject', 'html?', 'text?', 'template_id?', 'variables?', 'tags?', 'headers?', 'reply_to?', 'idempotency_key?', 'track_opens?', 'track_clicks?']);
 $notideus->emails()->sendBatch([['from' => …, 'to' => …, …]]); // up to 100
 ```
 

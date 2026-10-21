@@ -13,6 +13,8 @@ final class EmailsResource
     }
 
     /**
+     * @param bool $params['track_opens']  Opt into open tracking (default false)
+     * @param bool $params['track_clicks'] Opt into click tracking (default false)
      * @param array<string, mixed> $params
      * @return array<string, mixed>
      */
