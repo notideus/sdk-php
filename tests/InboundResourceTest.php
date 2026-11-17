@@ -19,7 +19,7 @@ final class InboundResourceTest extends TestCase
     private const MESSAGE = '{"id":"m1","route_id":"r1","from_addr":"jane@example.com","from_name":"Jane",'
         . '"to_addr":"support@example.com","subject":"Hi","text":"hello","html":"","headers":{},'
         . '"attachments":[],"spam_verdict":null,"size_kb":1,"status":"received","error":null,'
-        . '"received_at":"2026-10-01T12:00:00Z"}';
+        . '"received_at":"2026-10-01T12:00:00Z","read_at":null,"starred":false,"folder":"inbox","folder_id":null}';
 
     /** @param list<Response> $responses */
     private function client(array $responses, array &$history): NotideusClient
@@ -181,5 +181,53 @@ final class InboundResourceTest extends TestCase
         self::assertSame('report.csv', $result['filename']);
         self::assertSame('text/csv', $result['content_type']);
         self::assertSame('/v1/inbound/messages/m1/attachments/0', $history[0]['request']->getUri()->getPath());
+    }
+
+    public function testMessageUpdateAndDelete(): void
+    {
+        $history = [];
+        $notideus = $this->client([
+            new Response(200, [], '{"message":' . self::MESSAGE . '}'),
+            new Response(204),
+        ], $history);
+
+        $message = $notideus->inbound()->messages()->update('m1', ['read' => true, 'starred' => true]);
+        $notideus->inbound()->messages()->delete('m1');
+
+        self::assertSame('received', $message['status']);
+        self::assertSame('PATCH', $history[0]['request']->getMethod());
+        /** @var array{read: bool, starred: bool} $body */
+        $body = json_decode((string) $history[0]['request']->getBody(), true);
+        self::assertTrue($body['read']);
+        self::assertTrue($body['starred']);
+        self::assertSame('DELETE', $history[1]['request']->getMethod());
+        self::assertSame('/v1/inbound/messages/m1', $history[1]['request']->getUri()->getPath());
+    }
+
+    public function testFolderCrudAndCounts(): void
+    {
+        $folder = '{"id":"f1","name":"Follow up",'
+            . '"created_at":"2026-11-17T10:00:00Z","updated_at":"2026-11-17T10:00:00Z"}';
+        $history = [];
+        $notideus = $this->client([
+            new Response(201, [], '{"folder":' . $folder . '}'),
+            new Response(200, [], '{"folder":' . $folder . '}'),
+            new Response(200, [], '{"data":[' . $folder . '],"counts":{"inbox":1,"unread":1},"route_unread":{"r1":1}}'),
+            new Response(204),
+        ], $history);
+
+        $created = $notideus->inbound()->folders()->create('Follow up');
+        $notideus->inbound()->folders()->update('f1', 'Later');
+        $overview = $notideus->inbound()->folders()->list();
+        $notideus->inbound()->folders()->delete('f1');
+
+        self::assertSame('f1', $created['id']);
+        self::assertSame(1, $overview['counts']['unread']);
+        self::assertSame(1, $overview['route_unread']['r1']);
+        self::assertSame('POST', $history[0]['request']->getMethod());
+        self::assertSame('PATCH', $history[1]['request']->getMethod());
+        self::assertSame('/v1/inbound/folders/f1', $history[1]['request']->getUri()->getPath());
+        self::assertSame('GET', $history[2]['request']->getMethod());
+        self::assertSame('DELETE', $history[3]['request']->getMethod());
     }
 }

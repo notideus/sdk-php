@@ -13,6 +13,8 @@ final class EmailsResource
     }
 
     /**
+     * @param list<string> $params['cc']   Optional CC recipients
+     * @param list<string> $params['bcc']  Optional BCC recipients
      * @param bool $params['track_opens']  Opt into open tracking (default false)
      * @param bool $params['track_clicks'] Opt into click tracking (default false)
      * @param array<string, mixed> $params

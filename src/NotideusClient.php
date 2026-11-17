@@ -7,6 +7,7 @@ namespace Notideus;
 use Notideus\Http\ApiClient;
 use Notideus\Resources\ContactsResource;
 use Notideus\Resources\EmailsResource;
+use Notideus\Resources\EventsResource;
 use Notideus\Resources\InboundResource;
 use Notideus\Resources\PlansResource;
 use Notideus\Resources\UnsubscribeResource;
@@ -17,6 +18,7 @@ final class NotideusClient
 {
     private readonly ApiClient $api;
     private ?EmailsResource $emails = null;
+    private ?EventsResource $events = null;
     private ?ContactsResource $contacts = null;
     private ?WhatsAppResource $whatsapp = null;
     private ?UnsubscribeResource $unsubscribe = null;
@@ -33,6 +35,11 @@ final class NotideusClient
     public function emails(): EmailsResource
     {
         return $this->emails ??= new EmailsResource($this->api);
+    }
+
+    public function events(): EventsResource
+    {
+        return $this->events ??= new EventsResource($this->api);
     }
 
     public function contacts(): ContactsResource

@@ -13,7 +13,10 @@ final class InboundMessagesResource
     }
 
     /**
-     * @param array{q?: string, route_id?: string, cursor?: string, limit?: int} $params
+     * @param array{
+     *   q?: string, route_id?: string, folder?: string, folder_id?: string,
+     *   unread?: bool, attachments?: bool, sort?: string, cursor?: string, limit?: int
+     * } $params
      * @return array{data: array<int, array<string, mixed>>, next_cursor?: string}
      */
     public function list(array $params = []): array
@@ -31,6 +34,23 @@ final class InboundMessagesResource
         $result = $this->api->request('GET', '/v1/inbound/messages/' . rawurlencode($id));
 
         return $result['message'];
+    }
+
+    /**
+     * @param array{read?: bool, starred?: bool, folder?: string, folder_id?: string} $params
+     * @return array<string, mixed>
+     */
+    public function update(string $id, array $params): array
+    {
+        /** @var array{message: array<string, mixed>} $result */
+        $result = $this->api->request('PATCH', '/v1/inbound/messages/' . rawurlencode($id), ['body' => $params]);
+
+        return $result['message'];
+    }
+
+    public function delete(string $id): void
+    {
+        $this->api->request('DELETE', '/v1/inbound/messages/' . rawurlencode($id));
     }
 
     /** @return array{contents: string, filename: string, content_type: string} */

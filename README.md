@@ -64,6 +64,21 @@ $notideus->emails()->send(['from', 'to', 'subject', 'html?', 'text?', 'template_
 $notideus->emails()->sendBatch([['from' => …, 'to' => …, …]]); // up to 100
 ```
 
+### Automation events
+
+Send a custom event to start every active automation that matches its name. Provide exactly one recipient: an `email` address or an existing `contact_id`. The `202 Accepted` response confirms asynchronous dispatch, not email delivery.
+
+```php
+$result = $notideus->events()->send([
+    'event' => 'user.created',
+    'email' => 'ada@example.com', // or: 'contact_id' => 'contact-uuid'
+    'payload' => ['first_name' => 'Ada', 'plan' => 'Pro'],
+    'idempotency_key' => 'signup-42',
+]);
+```
+
+Top-level payload fields fill matching template variables; `{{email}}` and `{{event_name}}` are built in. Replaying an `idempotency_key` returns the same event with `created: false` and never creates a duplicate run.
+
 ### WhatsApp messages
 
 ```php
