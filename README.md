@@ -79,19 +79,6 @@ $result = $notideus->events()->send([
 
 Top-level payload fields fill matching template variables; `{{email}}` and `{{event_name}}` are built in. Replaying an `idempotency_key` returns the same event with `created: false` and never creates a duplicate run.
 
-### WhatsApp messages
-
-```php
-$notideus->whatsapp()->messages()->send([
-    'template_id' => 'tpl-1',
-    'to' => ['+33612345678'],
-    'parameters' => ['body:1' => 'Jane'],
-]);
-$notideus->whatsapp()->messages()->sendBatch([…]);
-```
-
-`send` returns one entry per recipient: `[['id' => …, 'to' => …, 'status' => …]]`.
-
 ### Contacts
 
 ```php

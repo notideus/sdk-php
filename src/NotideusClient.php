@@ -12,7 +12,6 @@ use Notideus\Resources\InboundResource;
 use Notideus\Resources\PlansResource;
 use Notideus\Resources\UnsubscribeResource;
 use Notideus\Resources\WebhooksResource;
-use Notideus\Resources\WhatsAppResource;
 
 final class NotideusClient
 {
@@ -20,7 +19,6 @@ final class NotideusClient
     private ?EmailsResource $emails = null;
     private ?EventsResource $events = null;
     private ?ContactsResource $contacts = null;
-    private ?WhatsAppResource $whatsapp = null;
     private ?UnsubscribeResource $unsubscribe = null;
     private ?PlansResource $plans = null;
     private ?WebhooksResource $webhooks = null;
@@ -45,11 +43,6 @@ final class NotideusClient
     public function contacts(): ContactsResource
     {
         return $this->contacts ??= new ContactsResource($this->api);
-    }
-
-    public function whatsapp(): WhatsAppResource
-    {
-        return $this->whatsapp ??= new WhatsAppResource($this->api);
     }
 
     public function unsubscribe(): UnsubscribeResource
