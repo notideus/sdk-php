@@ -4,6 +4,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Guzzle majors need deliberate SDK work: phpstan level 8 fails against
+      # Guzzle 8 because RequestException::getResponse() no longer exists
+      # (src/Http/ApiClient.php maps it for the error envelope and retries).
+      # Revisit when Guzzle 8 support is scheduled.
+      - dependency-name: guzzlehttp/guzzle
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
